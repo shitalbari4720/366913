@@ -92,7 +92,7 @@ fileInput.addEventListener("change", async (e) => {
 
   try {
     const result = await html5QrCode.scanFile(file, true);
-    showResult(result);
+    ReedomVoucher(result);
   } catch (err) {
     console.error(err);
     resultDiv.textContent = "Image scan failed: " + err;
@@ -347,3 +347,4 @@ video {
 </html>-->
 
  
+
