@@ -41,21 +41,21 @@
             font-weight: bold;
             color: green;
         }
+        input[type="file"] { margin-top:10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Scan QR Code</h1>
         <button id="start-btn">Start Scanner</button>
+        <input type="file" id="file-input" accept="image/*" />
         <div id="reader"></div>
         <div id="result"></div>
         <input type="hidden" id="VCode" name="VCode" value="" />
     </div>
-    <script>
-
-        var options = { timeout: 15000, enableHighAccuracy: false };
-
+    <script> 
         const startBtn = document.getElementById("start-btn");
+        const fileInput = document.getElementById("file-input");
         const readerDiv = document.getElementById("reader");
         const resultDiv = document.getElementById("result");
         let html5QrCode;
@@ -73,37 +73,38 @@
                     (decodedText) => {
                         resultDiv.innerHTML = "QR: " + decodedText + "<br>Getting location...";
                         html5QrCode.stop();
-                        
+                        ReedomVoucher(decodedText);
                      
 
-                        if (navigator.geolocation) {
-                            navigator.geolocation.getCurrentPosition(
-                                (position) => {
-                                    const lat = position.coords.latitude.toFixed(6);
-                                    const lon = position.coords.longitude.toFixed(6);
-                                    resultDiv.innerHTML = `
-                                <b>QR Code:</b> ${decodedText}<br>
-                                <b>Latitude:</b> ${lat}<br>
-                                <b>Longitude:</b> ${lon}
-                            `;
-                                    ReedomVoucher(decodedText,lat,lon);
-                                },
-                                (error) => {
-                                    resultDiv.innerHTML = "Location error: " + error.message;
-                                },
-                                { enableHighAccuracy: true, timeout: 10000 }
-                            );
-                        } else {
-                            resultDiv.innerHTML = "Geolocation not supported by this browser.";
-                        }
+                        
                     }
                 );
             } catch (err) {
                 resultDiv.textContent = "Camera error: " + err;
             }
         });
-        function ReedomVoucher(decodedText,lat,lon){
-            alert("QR Code:"+ decodedText+ "\n Latitude:"+ lat+"\n Longitude:+"+ lon);
+
+        function ReedomVoucher(decodedText){
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude.toFixed(6);
+                        const lon = position.coords.longitude.toFixed(6);
+                        resultDiv.innerHTML = `
+                                <b>QR Code:</b> ${decodedText}<br>
+                                <b>Latitude:</b> ${lat}<br>
+                                <b>Longitude:</b> ${lon}
+                            `;
+                        alert("QR Code:"+ decodedText+ "\n Latitude:"+ lat+"\n Longitude:+"+ lon);
+                    },
+                    (error) => {
+                        resultDiv.innerHTML = "Location error: " + error.message;
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                resultDiv.innerHTML = "Geolocation not supported by this browser.";
+            } 
         }
  
     </script>
