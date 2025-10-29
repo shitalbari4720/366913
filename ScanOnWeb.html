@@ -1,55 +1,112 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mobile QR Scanner</title>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<style>
-body { font-family: Arial; text-align:center; background: rgba(128,0,0,0.66); }
-.container { background:#fff; padding:20px; margin:20px auto; border-radius:8px; max-width:400px; }
-button { padding:10px 20px; margin:10px 0; cursor:pointer; background:#008000ad; color:#fff; border:none; border-radius:5px; }
-#reader { width:100%; display:none; margin-top:10px; }
-#result { margin-top:15px; font-weight:bold; color:green; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile QR Scanner</title>
+    <script src="html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: rgba(128,0,0,0.66);
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 8px;
+            max-width: 400px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            cursor: pointer;
+            background: #008000ad;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #reader {
+            width: 100%;
+            display: none;
+            margin-top: 10px;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<h1>Scan QR Code</h1>
-<button id="start-btn">Start Scanner</button>
-<div id="reader"></div>
-<div id="result"></div>
-</div>
+    <div class="container">
+        <h1>Scan QR Code</h1>
+        <button id="start-btn">Start Scanner</button>
+        <div id="reader"></div>
+        <div id="result"></div>
+        <input type="hidden" id="VCode" name="VCode" value="" />
+    </div>
+    <script>
 
-<script>
-const startBtn = document.getElementById("start-btn");
-const readerDiv = document.getElementById("reader");
-const resultDiv = document.getElementById("result");
-let html5QrCode;
+        var options = { timeout: 15000, enableHighAccuracy: false };
 
-startBtn.addEventListener("click", async () => {
-    startBtn.style.display = "none";
-    readerDiv.style.display = "block";
+        const startBtn = document.getElementById("start-btn");
+        const readerDiv = document.getElementById("reader");
+        const resultDiv = document.getElementById("result");
+        let html5QrCode;
 
-    html5QrCode = new Html5Qrcode("reader");
+        startBtn.addEventListener("click", async () => {
+            readerDiv.style.display = "block";
+            startBtn.style.display = "none";
 
-    const config = { fps: 10, qrbox: 250 };
+            html5QrCode = new Html5Qrcode("reader");
 
-    try {
-        await html5QrCode.start(
-            { facingMode: "environment" },
-            config,
-            qrCodeMessage => {
-                resultDiv.textContent = "QR Code: " + qrCodeMessage;
-                // Stop scanning after successful read
-                html5QrCode.stop();
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: 250 },
+                    (decodedText) => {
+                        resultDiv.innerHTML = "QR: " + decodedText + "<br>Getting location...";
+                        html5QrCode.stop();
+                        
+                     
+
+                        if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                                (position) => {
+                                    const lat = position.coords.latitude.toFixed(6);
+                                    const lon = position.coords.longitude.toFixed(6);
+                                    resultDiv.innerHTML = `
+                                <b>QR Code:</b> ${decodedText}<br>
+                                <b>Latitude:</b> ${lat}<br>
+                                <b>Longitude:</b> ${lon}
+                            `;
+                                    ReedomVoucher(decodedText,lat,lon);
+                                },
+                                (error) => {
+                                    resultDiv.innerHTML = "Location error: " + error.message;
+                                },
+                                { enableHighAccuracy: true, timeout: 10000 }
+                            );
+                        } else {
+                            resultDiv.innerHTML = "Geolocation not supported by this browser.";
+                        }
+                    }
+                );
+            } catch (err) {
+                resultDiv.textContent = "Camera error: " + err;
             }
-        );
-    } catch (err) {
-        resultDiv.textContent = "Error starting camera: " + err;
-    }
-});
-</script>
+        });
+        function ReedomVoucher(decodedText,lat,lon){
+            alert("QR Code:"+ decodedText+ "\n Latitude:"+ lat+"\n Longitude:+"+ lon);
+        }
+ 
+    </script>
 </body>
 </html>
 
@@ -149,7 +206,6 @@ startBtn.addEventListener("click", async () => {
     </script>
 </body>
 </html>-->
-
 <!--<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -158,7 +214,7 @@ startBtn.addEventListener("click", async () => {
           content="width=device-width, initial-scale=1.0">
 
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <title>QR Scanner</title> 
+    <title>QR Scanner</title>
     <style>
         /* style.css file*/
 body {
@@ -242,7 +298,7 @@ video {
             </div>
         </div>
     </div>
-    
+
     <script>
         // script.js file
 
@@ -272,4 +328,5 @@ video {
         });
     </script>
 </body>
-</html>--> 
+</html>-->
+ 
