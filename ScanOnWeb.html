@@ -83,6 +83,21 @@
                 resultDiv.textContent = "Camera error: " + err;
             }
         });
+// Image File Scan
+fileInput.addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const html5QrCode = new Html5Qrcode("reader");
+
+  try {
+    const result = await html5QrCode.scanFile(file, true);
+    showResult(result);
+  } catch (err) {
+    console.error(err);
+    resultDiv.textContent = "Image scan failed: " + err;
+  }
+});
 
         function ReedomVoucher(decodedText){
             if (navigator.geolocation) {
@@ -330,4 +345,5 @@ video {
     </script>
 </body>
 </html>-->
+
  
